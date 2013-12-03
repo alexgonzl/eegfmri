@@ -1,0 +1,41 @@
+%his script puts all the results into a single file
+
+subjs = { 'ef_040412'  'ef_040512' 'ef_040712' 'ef_040712_2'  'ef_041112' 'ef_042912' 'ef_050112'};
+nsubjs = numel(subjs);
+rois = {'allchnls'}; % or {'LPI','LPS','PM','RPS','RPI','LFI','LFS','FM','RFS','RFI'};
+nrois = numel(rois);
+perfmetric = 'bac';
+conds = {'hits','cr'};
+solver = 'glmnetsolveralpha0p9'; % 'glmnetsolveralpha0p5';
+dur = '0_1';
+binsize = 'binsize50';
+
+datapath = '/biac4/wagner/biac3/wagner5/alan/eegfmri/fmri_data/';
+
+perfmat = zeros(nsubjs,nrois);
+
+for s = 1: nsubjs
+    filepath = [datapath subjs{s} '/erpData/classificationResults/'];
+    for r = 1: nrois
+         filename = [subjs{s} '_' conds{1} '_' conds{2} '_' solver  ...
+             '_time' dur '_' rois{r} '_' binsize '.mat'];
+         load([filepath filename])
+         perfmat(s,r)=param_model.maxperf_BAC;
+         
+    end 
+end
+
+%%
+
+using all channels
+perfmat =
+
+    0.5075
+    0.5579
+    0.4896
+    0.5179
+    0.6171
+    0.4797
+    0.4514
+
+us
