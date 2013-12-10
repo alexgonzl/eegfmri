@@ -10,7 +10,7 @@ function CNRCalc(subj,run)
 lockType    = 'RT'; % can be either stim or RT
 % at what stage;    GA  -> after GA cleaning
 %                   BCG -> after BCG cleaning
-type        = 'BCG';
+type        = 'GA';
 
 % processing stream
 switch type
@@ -19,8 +19,8 @@ switch type
         %processingSteps = 'FiltOBSBCGFiltFASTRGA';
         processingSteps = 'FiltOBSBCGFiltSTGA';
     case 'GA'
-        %processingSteps = 'FiltSTGA';
-        processingSteps = 'FiltFASTRGA';
+        processingSteps = 'FiltSTGA';
+        %processingSteps = 'FiltFASTRGA';
 end
 
 preFix = [lockType 'LockERPs' processingSteps]; 
@@ -55,16 +55,18 @@ CNRidx  = S.time>=S.CNRtimes(1) & S.time<=S.CNRtimes(2);
 
 % trialWise CNR
 %mean across the channel grouping CNR times
-C = squeeze(mean(S.erp(S.CNRchans,:,CNRidx),1));
+C = squeeze(nanmean(S.erp(S.CNRchans,:,CNRidx),1));
 
 % take the peak amplitude during CNR time
-C = abs(max(C,[],2));
+C = max(abs(C),[],2);
 
 % take the baseline as the mean of the standard deviation across channels
 bsl = mean(S.baseLineStds(S.CNRchans,:),1);
 
-S.tCNR = C./bsl(1:numel(C))';
-S.metCNR = nanmedian(S.tCNR);
+S.tCNR      = C./bsl(1:numel(C))';
+S.nTrials   = sum(~isnan(S.tCNR));
+S.metCNR    = nanmedian(S.tCNR);
+S.setCNR    = nanstd(S.tCNR)/sqrt(S.nTrials-1);
 
 % BlockWise CNR
 trials   = ~isnan(S.RTs);

@@ -1,8 +1,7 @@
 function [out] = summaryCNR(CNRtype)
 
 
-% at what stage;    GA  -> after GA cleanings
-%                   BCG -> after BCG cleaning
+% CNR type: {'t','b'}
 
 
 mainPath    = '/biac4/wagner/biac3/wagner5/alan/eegfmri/fmri_data/';
