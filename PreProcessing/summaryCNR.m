@@ -1,75 +1,63 @@
-function [out] = summaryCNR(CNRtype)
+function [out] = summaryCNR(lockType)
 
 
-% CNR type: {'t','b'}
+% lockType : {'stim','RT'}
 
 
-mainPath    = '/biac4/wagner/biac3/wagner5/alan/eegfmri/fmri_data/';
-lockType    = 'RT';
+mainPath        = '/biac4/wagner/biac3/wagner5/alan/eegfmri/fmri_data/';
+saveFileName    = strcat('summaryCNR',lockType);
+savePath        = strcat(mainPath,'EEG_group/','CNR/');
+
+if ~exist(savePath,'dir'), mkdir(savePath), end;
 
 %%
-subjs = [4:6 8:13 15 16 18:20 22 23 25:27];
-runs  = 1:5;
 
 out = [];
-out.CNR_FASTR_GA      = nan(numel(subjs)*numel(runs),1);
-out.CNR_OBS_BCG     = nan(numel(subjs)*numel(runs),1);
-out.CNR_ST_GA      = nan(numel(subjs)*numel(runs),1);
-out.CNR_ST_BCG     = nan(numel(subjs)*numel(runs),1);
-out.runNum      = zeros(numel(subjs)*numel(runs),1);
-out.subjNum     = zeros(numel(subjs)*numel(runs),1);
+out.subjs   = [4:6 8:13 15 16 18:20 22 23 25:27];
+out.runs    = 1:5;
+
+nBlocks     = numel(out.subjs)*numel(out.runs);
+
+out.runNum              = zeros(nBlocks,1);
+out.subjNum             = zeros(nBlocks,1);
+
+out.colNames            = {'metCNR','setCNR','q25tCNR','q75tCNR','mebCNR','nTrials'};
+out.methods             = {'FiltFASTRGA','FiltSTGA','FiltSTBCGFiltSTGA','FiltOBSBCGFiltFASTRGA', 'FiltOBSBCGFiltSTGA'};
+
+nCols       = numel(out.colNames);
+nMethods    = numel(out.methods);
+
+for jj = 1:nMethods
+    out.(out.methods{jj}) = nan(nBlocks,nCols);
+end
 
 counter = 1;
-for s = subjs
-    for r = runs
+for s = out.subjs
+    for r = out.runs
         out.subjNum(counter)    = s;
         out.runNum(counter)     = r;
         
         subjId = EF_num2Sub(s);
+        subjPath    = [mainPath subjId '/eeg/epoched/r' num2str(r) '/CNR/'];
         
-        %if counter == 49; keyboard; end
-        % FASTR GA
-        try
-            fileName    = ['CNR' lockType 'LockERPsFiltFASTRGA.mat'];
-            subjPath    = [mainPath subjId '/eeg/epoched/r' num2str(r) '/CNR/'];
-            load([subjPath fileName])
-            out.CNR_FASTR_GA(counter) = S.(['me' CNRtype 'CNR']);
-        catch            
+        for jj = 1:nMethods
+            try
+                fileName    = ['CNR' lockType 'LockERPs' out.methods{jj} '.mat'];
+                load([subjPath fileName])
+                
+                for col = 1:nCols;
+                    out.(out.methods{jj})(counter,col) = S.(out.colNames{col});
+                end
+            catch
+            end
         end
-        
-        % ST GA
-        try
-            fileName    = ['CNR' lockType 'LockERPsFiltSTGA.mat'];
-            subjPath    = [mainPath subjId '/eeg/epoched/r' num2str(r) '/CNR/'];
-            load([subjPath fileName])
-            out.CNR_ST_GA(counter) = S.(['me' CNRtype 'CNR']);
-        catch            
-        end
-        
-        % OBS BCG
-        try
-            fileName    = ['CNR' lockType 'LockERPsFiltOBSBCGFiltFASTRGA.mat'];
-            subjPath    = [mainPath subjId '/eeg/epoched/r' num2str(r) '/CNR/'];
-            load([subjPath fileName])
-            out.CNR_OBS_BCG(counter) = S.(['me' CNRtype 'CNR']);
-        catch            
-        end
-        
-        % ST BCG
-        try
-            fileName    = ['CNR' lockType 'LockERPsFiltSTBCGFiltSTGA.mat'];
-            subjPath    = [mainPath subjId '/eeg/epoched/r' num2str(r) '/CNR/'];
-            load([subjPath fileName])
-            out.CNR_ST_BCG(counter) = S.(['me' CNRtype 'CNR']);
-        catch
-        end
-
         counter = counter + 1;
-        
     end
 end
 
-% N=numel(subjs)*numel(runs);
+save(strcat(savePath,saveFileName),'out')
+
+% N=nBlocks;
 % nSubjs = numel(unique(subjNum));
 %%
 %
