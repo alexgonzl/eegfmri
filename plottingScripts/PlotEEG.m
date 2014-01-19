@@ -48,7 +48,7 @@ BCGTimes        = BCGTimes(ismember(BCGSamps,SampRange));
 close all
 
 figure(1);clf; hold on;
-set(gcf,'position',[100 500 1600 200],'paperPositionMode','auto')
+set(gcf,'position',[100 500 1000 200],'paperPositionMode','auto')
 plot(t(SampRange),signal(SampRange),'k');axis tight
 
 YLim = ylim;

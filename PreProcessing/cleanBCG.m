@@ -8,8 +8,8 @@ function cleanBCG(subj,run)
 %% directories and other settings
 
 % prefix indicates the levels of processing the file has gone through
-%preFix = 'FiltFASTRGA';
-preFix = 'FiltSTGA';
+preFix = 'FiltFASTRGA';
+%preFix = 'FiltSTGA';
 BCGCleanMethod  = 'OBS';
 
 subjId = EF_num2Sub(subj);

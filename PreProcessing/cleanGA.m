@@ -10,7 +10,7 @@ function cleanGA(subj,run)
 
 subjId = EF_num2Sub(subj);
 
-GAcleanMethod   = 'FASTR';
+GAcleanMethod   = 'IAR';
 subjPath        = ['/biac4/wagner/biac3/wagner5/alan/eegfmri/fmri_data/' subjId '/eeg/'];
 rawPath         = [subjPath  'raw/r' num2str(run) '/'];
 fileName        =  'RawData.mat';
@@ -61,8 +61,8 @@ switch S.GAcleanMethod
         % number of artifacts to include in the averaging
         S.FASTR.window = 30;
         
-        
-        S.FASTR.Trigs = S.MR_Pulses + 1;
+        % exclude last couple of pulses, fmrib_fastr bug
+        S.FASTR.Trigs = S.MR_Pulses(1:end-3) + 1;
         % slice triggers (true)
         S.FASTR.strig = 1;
         
@@ -89,7 +89,10 @@ switch S.GAcleanMethod
         S = fmrib_fastr(S, S.FASTR.lpf, S.FASTR.L, S.FASTR.window, S.FASTR.Trigs, ...
              S.FASTR.strig, S.FASTR.anc_chk, S.FASTR.tc_chk, S.FASTR.Volumes,...
               S.FASTR.Slices,  S.FASTR.pre_frac,  S.FASTR.exc, S.FASTR.NPC);
+    case 'IAR'
+        addpath('/biac4/wagner/biac3/wagner5/alan/eegfmri/scripts/alexScripts/PreProcessing/fmrib/')
         
+        S = IAR_GA_Clean(S);
 end
 
 %% Recording Information

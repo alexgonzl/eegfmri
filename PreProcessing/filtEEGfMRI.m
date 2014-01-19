@@ -6,15 +6,21 @@ function filtEEGfMRI(subj,run)
 %   run  -> run number
 
 %% directories and other settings
-
-type = 'BCG'; 
 % at what stage to filter;  GA  -> after GA cleaning
 %                           BCG -> after BCG cleaning
+type = 'GA'; 
 
-%preFix = 'OBSBCGFiltFASTRGA'; % method use to clean
-preFix = 'OBSBCGFiltSTGA'; % method use to clean
-%preFix = 'FASTRGA'; % method use to clean
-
+% processing stream
+switch type
+    case 'BCG'
+        %preFix = 'STBCGFiltSTGA';
+        preFix = 'OBSBCGFiltFASTRGA';
+        %preFix = 'OBSBCGFiltSTGA';
+    case 'GA'
+        %preFix = 'STGA';
+        %preFix = 'FASTRGA';
+        preFix = 'IARGA';
+end
 subjId = EF_num2Sub(subj);
 
 subjPath        = ['/biac4/wagner/biac3/wagner5/alan/eegfmri/fmri_data/' subjId '/eeg/'];

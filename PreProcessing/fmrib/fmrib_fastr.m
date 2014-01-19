@@ -572,10 +572,14 @@ for sec=1:sections
             end
         elseif s>=starts+1;
             ppn=1;
-            for pp=secmarker(s)-searchw:secmarker(s)+searchw
-                match(ppn)=prcorr2(slice_art(1,:),...
-                    Idata(pp-pre_peak:pp+post_peak));
-                ppn=ppn+1;
+            try
+                for pp=secmarker(s)-searchw:secmarker(s)+searchw
+                    match(ppn)=prcorr2(slice_art(1,:),...
+                        Idata(pp-pre_peak:pp+post_peak));
+                    ppn=ppn+1;
+                end
+            catch
+                keyboard
             end
             [CV,CP]=max(match);
             adjust=CP-(searchw+1);
@@ -850,6 +854,11 @@ for c=1:m
             end
         end
         
+        % checks for NaN Alpha, i.e. bad channel, continue to the next one.  
+        % added by Alex Gonzalez, Dec. 12, 2013
+        if isnan(Alpha)
+            continue;
+        end
         
         %----------PCA of residuals-------------------
         fitted_res=zeros(length(INoise),1);
